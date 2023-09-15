@@ -1,13 +1,10 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.searchBooks = exports.getBooks = void 0;
-const book_js_1 = __importDefault(require("../models/book.js"));
+var book_js_1 = require("../models/book.js");
 // GET /books --> Get All books
 function getBooks(req, res) {
-    book_js_1.default.fetchAll((books) => {
+    book_js_1.default.fetchAll(function (books) {
         res.json(books);
     });
 }
@@ -15,13 +12,13 @@ exports.getBooks = getBooks;
 // GET /search?search="str" --> Get books that match the search
 function searchBooks(req, res) {
     try {
-        const searchQuery = req.query.search;
-        if (!searchQuery) {
+        var searchQuery_1 = req.query.search;
+        if (!searchQuery_1) {
             throw new Error("Search query is missing");
         }
-        book_js_1.default.fetchAll((books) => {
-            const filteredBooks = books.filter((book) => {
-                return book.name.toLowerCase().includes(searchQuery.toLowerCase());
+        book_js_1.default.fetchAll(function (books) {
+            var filteredBooks = books.filter(function (book) {
+                return book.name.toLowerCase().includes(searchQuery_1.toLowerCase());
             });
             res.json(filteredBooks);
         });
@@ -31,4 +28,3 @@ function searchBooks(req, res) {
     }
 }
 exports.searchBooks = searchBooks;
-//# sourceMappingURL=books.js.map

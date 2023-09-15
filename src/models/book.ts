@@ -1,45 +1,31 @@
-import fs from "fs";
-import path from "path";
-
-const filePath: string = path.join(
-  path.dirname(require.main.filename),
-  "data",
-  "data.json"
-);
-
-const getBooksFromFile = (cb) => {
-  fs.readFile(filePath, (error, data) => {
-    if (error) {
-      cb([]);
-    } else {
-      cb(JSON.parse(data.toString()));
-    }
-  });
-};
-
-class Book {
+// src/models/book.ts
+export interface Book {
   name: string;
   author: string;
-  isbn: number;
-
-  constructor(name: string, author: string, isbn: number) {
-    this.name = name;
-    this.author = author;
-    this.isbn = isbn;
-  }
-
-  save() {
-    getBooksFromFile((books) => {
-      books.push(this);
-      fs.writeFile(filePath, JSON.stringify(books), (err) => {
-        console.log(err);
-      });
-    });
-  }
-
-  static fetchAll(cb) {
-    getBooksFromFile(cb);
-  }
+  isbn: string;
 }
 
-export default Book;
+export class BookModel {
+  private books: Book[] = [];
+
+  constructor() {
+    // Load books from a JSON file or a database here
+    // For now, let's load some sample data
+    this.loadSampleData();
+  }
+
+  private loadSampleData() {
+    // Load sample data from books.json
+    const sampleData: Book[] = require("../../data/books.json");
+    this.books = sampleData;
+  }
+
+  getAllBooks(): Book[] {
+    return this.books;
+  }
+
+  searchBooksByTitle(query: string): Book[] {
+    query = query.toLowerCase();
+    return this.books.filter((book) => book.name.toLowerCase().startsWith(query));
+  }
+}

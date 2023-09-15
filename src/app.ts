@@ -1,17 +1,12 @@
-import express, { Express, Request, Response } from "express";
-import bodyParser from "body-parser";
+// src/index.ts
+import express from "express";
+import booksRouter from "./routes/books";
 
-import bookRoutes from "./routes/book.js";
-import { get404, errorHandler } from "./controllers/error.js";
+const app = express();
+const PORT = process.env.PORT || 3000;
 
-const app: Express = express();
+app.use("/books", booksRouter);
 
-app.use(bodyParser.urlencoded({ extended: false }));
-
-app.use(bookRoutes);
-
-app.use(get404);
-
-app.use(errorHandler);
-
-app.listen(3000);
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
