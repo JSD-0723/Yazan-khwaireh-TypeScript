@@ -1,12 +1,35 @@
-// src/index.ts
-import express from "express";
-import booksRouter from "./routes/books";
+import express, { Request, Response } from 'express';
+import bodyParser from 'body-parser';
+import { readFileSync } from 'fs';
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const port = 3000;
 
-app.use("/books", booksRouter);
+// Middleware
+app.use(bodyParser.json());
 
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+// Load the book data from the JSON file
+const books = JSON.parse(readFileSync('books.json', 'utf8'));
+
+// GET endpoint to search for books by name
+app.get('/books', (req: Request, res: Response) => {
+    try {
+        const { query } = req.query;
+        if (!query || typeof query !== 'string') {
+            throw new Error('Invalid query parameter');
+        }
+
+        const matchingBooks = books.filter((book: { name: string }) => {
+            return book.name.toLowerCase().startsWith(query.toLowerCase());
+        });
+
+        res.json(matchingBooks);
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+});
+
+// Start the server
+app.listen(port, () => {
+    console.log(`Server is running on port ${port}`);
 });
