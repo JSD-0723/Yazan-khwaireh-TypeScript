@@ -1,5 +1,5 @@
 {
-  "name": "hanna-hinn-typescript",
+  "name": "yazan-khwaireh-typescript",
   "version": "1.0.0",
   "description": "Create a book library app that handles book rent journeys. So, what is needed for now is to create a NodeJS application using TypeScript, also:",
   "main": "app.js",
@@ -8,7 +8,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc"
   },
-  "author": "Hanna Hinn",
+  "author": "Yazan Khwireh",
   "license": "ISC",
   "dependencies": {
     "body-parser": "^1.20.2",
