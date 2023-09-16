@@ -15,17 +15,20 @@ const books = JSON.parse(readFileSync('books.json', 'utf8'));
 app.get('/books', (req: Request, res: Response) => {
     try {
         const { query } = req.query;
+          console.log(query);
         if (!query || typeof query !== 'string') {
             throw new Error('Invalid query parameter');
+          
         }
-
         const matchingBooks = books.filter((book: { name: string }) => {
             return book.name.toLowerCase().startsWith(query.toLowerCase());
         });
 
         res.json(matchingBooks);
     } catch (error) {
-        res.status(400).json({ error: error.message });
+        res.status(400)
+        console.log(error);
+        
     }
 });
 
