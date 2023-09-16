@@ -25,13 +25,7 @@ app.get('/books', (req, res) => {
         res.json(matchingBooks);
     }
     catch (error) {
-        if (typeof error === 'object' && 'message' in error) {
-            const customError = error;
-            res.status(400).json({ error: customError.message });
-        }
-        else {
-            res.status(500).json({ error: 'Internal Server Error' });
-        }
+        res.status(400).json({ error: error.message });
     }
 });
 // Start the server
