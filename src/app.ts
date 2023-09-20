@@ -23,8 +23,9 @@ app.use((err: any, req: Request, res: Response, next: any) => {
         console.log('Database connection has been established successfully.');
 
         // Synchronize models with the database. This will create tables if they don't exist.
+        // await sequelize.sync({ force: true });
         await sequelize.sync();
-
+        
         app.listen(5000, () => {
             console.log('Server is listening on port 5000...');
         });
