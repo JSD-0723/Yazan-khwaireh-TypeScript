@@ -1,6 +1,6 @@
 import express from 'express';
 import bookRoutes from "./routes/bookRoutes";
-import sequelize from './db/connection';
+import sequelize from './utils/connection';
 import errorMiddleware from "./middlewares/errorMiddleware"
 import get404 from "./controllers/error"
 

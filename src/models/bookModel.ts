@@ -1,5 +1,5 @@
 import { DataTypes  } from 'sequelize';
-import sequelize from '../db/connection';
+import sequelize from '../utils/connection';
 
 const booksModel = sequelize.define('booksModel', {
     id: {
@@ -8,7 +8,30 @@ const booksModel = sequelize.define('booksModel', {
         autoIncrement: true,
         primaryKey: true
     },
-    name: DataTypes.STRING(50)
+
+    name: {
+    type: DataTypes.STRING(50) ,
+    allowNull: false,
+    },
+
+    author:{
+
+        type: DataTypes.STRING(50) ,
+        allowNull: false,
+    },
+
+      isbn: {
+
+
+        type: DataTypes.INTEGER,
+        unique: true,
+        allowNull: false,
+
+
+      },
+
+
+
 });
 
 export default booksModel;
