@@ -1,76 +1,77 @@
 import { Request, Response } from 'express';
-import books from '../books.json';
+import books from '../models/books';
 
-// Adjust the Book type to match the structure in books.json
-type Book = {
-    id: number; // Add an id property
-    name: string;
-    author: string;
-    isbn: string;
-};
-
-// Generate IDs for each book since they don't have one in books.json
-const typedBooks: Book[] = books.map((book, index) => ({
-    id: index + 1,
-    ...book
-}));
 export const bookControllers = {
-    getBooks: (req: Request, res: Response) => {
-        if (!typedBooks) {
-            return res.status(404).json({ success: false, msg: `No books are found!` });
+    getBooks: async (req: Request, res: Response) => {
+        try {
+            const allBooks = await books.findAll();
+            res.status(200).json({ success: true, data: allBooks });
+        } catch (error) {
+            console.error('Error fetching books:', error);
+            res.status(500).json({ success: false, msg: 'Error fetching books' });
         }
-        res.status(200).json({ success: true, data: typedBooks });
     },
 
-    getBook: (req: Request, res: Response) => {
+    getBook: async (req: Request, res: Response) => {
         const id: number = Number(req.params.id);
-        const book = typedBooks.find((book: Book) => book.id === id);
-        if (!book) {
-            return res.status(404).json({ success: false, msg: `404: No book with id: ${id} is found` });
+        try {
+            const book = await books.findByPk(id);
+            if (!book) {
+                return res.status(404).json({ success: false, msg: `404: No book with id: ${id} is found` });
+            }
+            res.status(200).json({ success: true, data: book });
+        } catch (error) {
+            console.error('Error fetching book:', error);
+            res.status(500).json({ success: false, msg: 'Error fetching book' });
         }
-        res.status(200).json({ success: true, data: book });
     },
 
-    
-    createBook: (req: Request, res: Response) => {
-        const name: string = req.body.name;
-        const author: string = req.body.author;
-        const isbn: string = req.body.isbn;
-    
-        if (!name || !author || !isbn) {
-            return res.status(400).json({ success: false, msg: 'please provide name, author, and isbn values' });
+    createBook: async (req: Request, res: Response) => {
+        const { name, author, isbn } = req.body;
+
+        try {
+            const newBook = await books.create({ name, author, isbn });
+            res.status(201).json({ success: true, data: newBook });
+        } catch (error) {
+            console.error('Error creating book:', error);
+            res.status(500).json({ success: false, msg: 'Error creating book' });
         }
-    
-        typedBooks.push({ id: typedBooks.length + 1, name: name, author: author, isbn: isbn });
-        res.status(201).json({ success: true, data: typedBooks });
     },
 
-    updateBook: (req: Request, res: Response) => {
+    updateBook: async (req: Request, res: Response) => {
         const id: number = Number(req.params.id);
-        const name: string = req.body.name;
-        const bookIndex = typedBooks.findIndex((book: Book) => book.id === id);
+        const { name } = req.body;
 
-        if (bookIndex === -1) {
-            return res.status(404).json({ success: false, msg: `no book with id ${id}` });
+        try {
+            const book = await books.findByPk(id);
+            if (!book) {
+                return res.status(404).json({ success: false, msg: `No book with id: ${id} found` });
+            }
+
+            await book.update({ name });
+            res.status(200).json({ success: true, data: book });
+        } catch (error) {
+            console.error('Error updating book:', error);
+            res.status(500).json({ success: false, msg: 'Error updating book' });
         }
-
-        typedBooks[bookIndex].name = name;
-
-        res.status(200).json({ success: true, data: typedBooks });
     },
 
-    deleteBook: (req: Request, res: Response) => {
+    deleteBook: async (req: Request, res: Response) => {
         const id: number = Number(req.params.id);
-        const bookIndex = typedBooks.findIndex((book: Book) => book.id === id);
-        
-        if (bookIndex === -1) {
-            return res.status(404).json({ success: false, msg: `no book with id ${id}` });
+
+        try {
+            const book = await books.findByPk(id);
+            if (!book) {
+                return res.status(404).json({ success: false, msg: `No book with id: ${id} found` });
+            }
+
+            await book.destroy();
+            res.status(200).json({ success: true, msg: 'Book deleted successfully' });
+        } catch (error) {
+            console.error('Error deleting book:', error);
+            res.status(500).json({ success: false, msg: 'Error deleting book' });
         }
-
-        typedBooks.splice(bookIndex, 1);
-
-        res.status(200).json({ success: true, data: typedBooks });
-    }
+    },
 };
 
 export default bookControllers;

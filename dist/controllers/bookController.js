@@ -1,55 +1,85 @@
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.bookControllers = void 0;
-const books_json_1 = __importDefault(require("../books.json"));
-// Generate IDs for each book since they don't have one in books.json
-const typedBooks = books_json_1.default.map((book, index) => (Object.assign({ id: index + 1 }, book)));
+const books_1 = __importDefault(require("../models/books"));
 exports.bookControllers = {
-    getBooks: (req, res) => {
-        if (!typedBooks) {
-            return res.status(404).json({ success: false, msg: `No books are found!` });
+    getBooks: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+        try {
+            const allBooks = yield books_1.default.findAll();
+            res.status(200).json({ success: true, data: allBooks });
         }
-        res.status(200).json({ success: true, data: typedBooks });
-    },
-    getBook: (req, res) => {
+        catch (error) {
+            console.error('Error fetching books:', error);
+            res.status(500).json({ success: false, msg: 'Error fetching books' });
+        }
+    }),
+    getBook: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         const id = Number(req.params.id);
-        const book = typedBooks.find((book) => book.id === id);
-        if (!book) {
-            return res.status(404).json({ success: false, msg: `404: No book with id: ${id} is found` });
+        try {
+            const book = yield books_1.default.findByPk(id);
+            if (!book) {
+                return res.status(404).json({ success: false, msg: `404: No book with id: ${id} is found` });
+            }
+            res.status(200).json({ success: true, data: book });
         }
-        res.status(200).json({ success: true, data: book });
-    },
-    createBook: (req, res) => {
-        const name = req.body.name;
-        const author = req.body.author;
-        const isbn = req.body.isbn;
-        if (!name || !author || !isbn) {
-            return res.status(400).json({ success: false, msg: 'please provide name, author, and isbn values' });
+        catch (error) {
+            console.error('Error fetching book:', error);
+            res.status(500).json({ success: false, msg: 'Error fetching book' });
         }
-        typedBooks.push({ id: typedBooks.length + 1, name: name, author: author, isbn: isbn });
-        res.status(201).json({ success: true, data: typedBooks });
-    },
-    updateBook: (req, res) => {
+    }),
+    createBook: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+        const { name, author, isbn } = req.body;
+        try {
+            const newBook = yield books_1.default.create({ name, author, isbn });
+            res.status(201).json({ success: true, data: newBook });
+        }
+        catch (error) {
+            console.error('Error creating book:', error);
+            res.status(500).json({ success: false, msg: 'Error creating book' });
+        }
+    }),
+    updateBook: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         const id = Number(req.params.id);
-        const name = req.body.name;
-        const bookIndex = typedBooks.findIndex((book) => book.id === id);
-        if (bookIndex === -1) {
-            return res.status(404).json({ success: false, msg: `no book with id ${id}` });
+        const { name } = req.body;
+        try {
+            const book = yield books_1.default.findByPk(id);
+            if (!book) {
+                return res.status(404).json({ success: false, msg: `No book with id: ${id} found` });
+            }
+            yield book.update({ name });
+            res.status(200).json({ success: true, data: book });
         }
-        typedBooks[bookIndex].name = name;
-        res.status(200).json({ success: true, data: typedBooks });
-    },
-    deleteBook: (req, res) => {
+        catch (error) {
+            console.error('Error updating book:', error);
+            res.status(500).json({ success: false, msg: 'Error updating book' });
+        }
+    }),
+    deleteBook: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         const id = Number(req.params.id);
-        const bookIndex = typedBooks.findIndex((book) => book.id === id);
-        if (bookIndex === -1) {
-            return res.status(404).json({ success: false, msg: `no book with id ${id}` });
+        try {
+            const book = yield books_1.default.findByPk(id);
+            if (!book) {
+                return res.status(404).json({ success: false, msg: `No book with id: ${id} found` });
+            }
+            yield book.destroy();
+            res.status(200).json({ success: true, msg: 'Book deleted successfully' });
         }
-        typedBooks.splice(bookIndex, 1);
-        res.status(200).json({ success: true, data: typedBooks });
-    }
+        catch (error) {
+            console.error('Error deleting book:', error);
+            res.status(500).json({ success: false, msg: 'Error deleting book' });
+        }
+    }),
 };
 exports.default = exports.bookControllers;

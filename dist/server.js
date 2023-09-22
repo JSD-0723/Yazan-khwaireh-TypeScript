@@ -14,21 +14,25 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const bookRoutes_1 = __importDefault(require("./routes/bookRoutes"));
-const connection_1 = __importDefault(require("./db/connection"));
+const connection_1 = __importDefault(require("./utils/connection"));
+const errorMiddleware_1 = __importDefault(require("./middlewares/errorMiddleware"));
+const error_1 = __importDefault(require("./controllers/error"));
 const app = (0, express_1.default)();
 app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: false }));
 app.use('/api/books', bookRoutes_1.default);
-app.use((err, req, res, next) => {
-    console.error(err.stack);
-    res.status(500).send('Something went wrong!');
-});
+app.use(error_1.default);
+app.use(errorMiddleware_1.default);
 (() => __awaiter(void 0, void 0, void 0, function* () {
     try {
         yield connection_1.default.authenticate(); // Check the database connection
         console.log('Database connection has been established successfully.');
         // Synchronize models with the database. This will create tables if they don't exist.
-        // await sequelize.sync({ force: true });
+        yield connection_1.default.sync().then(() => {
+            console.log('Tables have been synchronized.');
+        }).catch((error) => {
+            console.error('Unable to synchronize tables:', error);
+        });
         app.listen(5000, () => {
             console.log('Server is listening on port 5000...');
         });

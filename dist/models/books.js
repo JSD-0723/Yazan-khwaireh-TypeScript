@@ -4,8 +4,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const sequelize_1 = require("sequelize");
-const connection_1 = __importDefault(require("../database/connection"));
-const booksModel = connection_1.default.define('book1', {
+const connection_1 = __importDefault(require("../utils/connection"));
+const books = connection_1.default.define('books', {
     id: {
         type: sequelize_1.DataTypes.INTEGER,
         allowNull: false,
@@ -26,4 +26,4 @@ const booksModel = connection_1.default.define('book1', {
         allowNull: false,
     },
 });
-exports.default = booksModel;
+exports.default = books;
