@@ -1,16 +1,20 @@
 import express from 'express';
 import bookRoutes from "./routes/bookRoutes";
 import sequelize from './db/connection';
-import  errorMiddleware from "./middlewares/errorMiddleware"
+import errorMiddleware from "./middlewares/errorMiddleware"
+import get404 from "./controllers/error"
+
 
 const app = express();
 
 app.use(express.json());
+
 app.use(express.urlencoded({ extended: false }));
+
 app.use('/api/books', bookRoutes);
 
 
-
+app.use(get404)
 
 app.use(errorMiddleware);
 
