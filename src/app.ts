@@ -1,6 +1,7 @@
-import express, {Request , Response } from 'express';
+import express from 'express';
 import bookRoutes from "./routes/bookRoutes";
 import sequelize from './db/connection';
+import  errorMiddleware from "./middlewares/errorMiddleware"
 
 const app = express();
 
@@ -11,10 +12,7 @@ app.use('/api/books', bookRoutes);
 
 
 
-app.use((err: any, req: Request, res: Response, next: any) => {
-    console.error(err.stack);
-    res.status(500).send('Something went wrong!');
-});
+app.use(errorMiddleware);
 
 
 (async () => {
@@ -23,7 +21,6 @@ app.use((err: any, req: Request, res: Response, next: any) => {
         console.log('Database connection has been established successfully.');
 
         // Synchronize models with the database. This will create tables if they don't exist.
-        // await sequelize.sync({ force: true });
         await sequelize.sync();
         
         app.listen(5000, () => {
