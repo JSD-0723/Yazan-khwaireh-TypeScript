@@ -40,21 +40,24 @@ export const bookControllers = {
 
     updateBook: async (req: Request, res: Response) => {
         const id: number = Number(req.params.id);
-        const { name } = req.body;
-
+        const { name, author, isbn } = req.body;
+    
         try {
             const book = await books.findByPk(id);
             if (!book) {
                 return res.status(404).json({ success: false, msg: `No book with id: ${id} found` });
             }
-
-            await book.update({ name });
+    
+            // Update the book record with the new data
+            await book.update({ name, author, isbn });
+    
             res.status(200).json({ success: true, data: book });
         } catch (error) {
             console.error('Error updating book:', error);
             res.status(500).json({ success: false, msg: 'Error updating book' });
         }
     },
+    
 
     deleteBook: async (req: Request, res: Response) => {
         const id: number = Number(req.params.id);
